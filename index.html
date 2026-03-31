@@ -1,0 +1,670 @@
+import { useState, useEffect, useRef } from "react";
+
+// ─── TRANSLATIONS ────────────────────────────────────────────────────────────
+const T = {
+  UZ: {
+    nav: { home: "Bosh sahifa", flavors: "Ta'mlar", about: "Biz haqimizda", reviews: "Sharhlar", order: "Buyurtma" },
+    hero: {
+      badge: "🍦 Yangi va tabiiy",
+      title: "Mazali muzqaymoq",
+      title2: "eshikka yetkaziladi",
+      sub: "Haqiqiy tabiiy ingredientlarning ta'mini his eting",
+      cta: "Hozir buyurtma bering",
+      scroll: "Pastga suring",
+    },
+    products: {
+      title: "Bizning ta'mlar",
+      sub: "Har bir qoshiq bir zavq",
+      order: "Buyurtma",
+      items: [
+        { name: "Vanil", desc: "Nozik va kremli klassik", price: "15 000 so'm", emoji: "🍦" },
+        { name: "Shokolad", desc: "Boy va qorong'u shokolad", price: "17 000 so'm", emoji: "🍫" },
+        { name: "Qulupnay", desc: "Yangi qulupnay meyvasi", price: "16 000 so'm", emoji: "🍓" },
+        { name: "Mango", desc: "Tropik va issiqlik", price: "18 000 so'm", emoji: "🥭" },
+        { name: "Pistashka", desc: "Noyob yong'oq ta'mi", price: "20 000 so'm", emoji: "🌿" },
+        { name: "Aralash", desc: "Eng yaxshi ta'mlar kombinatsiyasi", price: "22 000 so'm", emoji: "🎨" },
+      ],
+    },
+    why: {
+      title: "Nima uchun bizni tanlaysiz?",
+      sub: "Sifat va sevgi bilan tayyorlanadi",
+      items: [
+        { icon: "🌿", title: "100% tabiiy", desc: "Faqat toza va tabiiy ingredientlar" },
+        { icon: "⚡", title: "Tez yetkazib berish", desc: "30 daqiqa ichida eshikka" },
+        { icon: "⭐", title: "Yuqori sifat", desc: "Har bir porsiya nazorat qilinadi" },
+        { icon: "❤️", title: "Mijoz mamnuniyati", desc: "98% mijozlar qaytib keladi" },
+      ],
+    },
+    promo: {
+      badge: "🎁 Maxsus taklif",
+      title: "2 ta sotib oling,",
+      title2: "1 ta bepul oling!",
+      sub: "Cheklangan vaqt taklifidan foydalaning",
+      urgency: "⏰ Taklif bugun tugaydi!",
+      cta: "Hozir foydalaning",
+    },
+    reviews: {
+      title: "Mijozlarimiz nima deydi",
+      sub: "Haqiqiy fikrlar, haqiqiy odamlar",
+      items: [
+        { name: "Aziza T.", loc: "Toshkent", text: "Hayotimdagi eng mazali muzqaymoq! Har kuni buyurtma beraman. Ta'mi va sifati ajoyib!", rating: 5, avatar: "A" },
+        { name: "Bobur K.", loc: "Samarqand", text: "Tez yetkazib berish va ajoyib ta'mlar. Bolalarim juda xursand. Tavsiya qilaman!", rating: 5, avatar: "B" },
+        { name: "Nilufar R.", loc: "Namangan", text: "Tabiiy ingredientlardan tayyorlanishi juda yoqadi. Ishonchli do'kon!", rating: 5, avatar: "N" },
+      ],
+    },
+    cta: {
+      title: "Hozir buyurtma bering va",
+      title2: "sovuq baxtni his eting!",
+      sub: "Birinchi buyurtmaga 20% chegirma",
+      btn: "Buyurtma berish",
+    },
+    footer: "Barcha huquqlar himoyalangan",
+    sticky: "Buyurtma",
+  },
+  RU: {
+    nav: { home: "Главная", flavors: "Вкусы", about: "О нас", reviews: "Отзывы", order: "Заказать" },
+    hero: {
+      badge: "🍦 Свежее и натуральное",
+      title: "Вкусное мороженое",
+      title2: "с доставкой на дом",
+      sub: "Почувствуйте вкус настоящих натуральных ингредиентов",
+      cta: "Заказать сейчас",
+      scroll: "Прокрутите вниз",
+    },
+    products: {
+      title: "Наши вкусы",
+      sub: "Каждая ложка — наслаждение",
+      order: "Заказать",
+      items: [
+        { name: "Ваниль", desc: "Нежная и сливочная классика", price: "150 ₽", emoji: "🍦" },
+        { name: "Шоколад", desc: "Насыщенный тёмный шоколад", price: "170 ₽", emoji: "🍫" },
+        { name: "Клубника", desc: "Свежая клубника", price: "160 ₽", emoji: "🍓" },
+        { name: "Манго", desc: "Тропическое лакомство", price: "180 ₽", emoji: "🥭" },
+        { name: "Фисташка", desc: "Редкий ореховый вкус", price: "200 ₽", emoji: "🌿" },
+        { name: "Ассорти", desc: "Лучшие вкусы вместе", price: "220 ₽", emoji: "🎨" },
+      ],
+    },
+    why: {
+      title: "Почему выбирают нас?",
+      sub: "Готовится с качеством и любовью",
+      items: [
+        { icon: "🌿", title: "100% натуральное", desc: "Только чистые натуральные ингредиенты" },
+        { icon: "⚡", title: "Быстрая доставка", desc: "До двери за 30 минут" },
+        { icon: "⭐", title: "Высокое качество", desc: "Каждая порция проверяется" },
+        { icon: "❤️", title: "Довольные клиенты", desc: "98% клиентов возвращаются" },
+      ],
+    },
+    promo: {
+      badge: "🎁 Специальное предложение",
+      title: "Купите 2,",
+      title2: "получите 1 бесплатно!",
+      sub: "Воспользуйтесь ограниченным предложением",
+      urgency: "⏰ Предложение заканчивается сегодня!",
+      cta: "Воспользоваться сейчас",
+    },
+    reviews: {
+      title: "Что говорят наши клиенты",
+      sub: "Настоящие отзывы, настоящие люди",
+      items: [
+        { name: "Азиза Т.", loc: "Ташкент", text: "Самое вкусное мороженое в моей жизни! Заказываю каждый день. Вкус и качество потрясающие!", rating: 5, avatar: "А" },
+        { name: "Бобур К.", loc: "Самарканд", text: "Быстрая доставка и отличные вкусы. Дети в восторге. Рекомендую!", rating: 5, avatar: "Б" },
+        { name: "Нилуфар Р.", loc: "Наманган", text: "Очень нравится, что готовят из натуральных ингредиентов. Надёжный магазин!", rating: 5, avatar: "Н" },
+      ],
+    },
+    cta: {
+      title: "Закажите сейчас и",
+      title2: "ощутите холодное счастье!",
+      sub: "Скидка 20% на первый заказ",
+      btn: "Сделать заказ",
+    },
+    footer: "Все права защищены",
+    sticky: "Заказать",
+  },
+  KG: {
+    nav: { home: "Башкы бет", flavors: "Даамдар", about: "Биз жөнүндө", reviews: "Пикирлер", order: "Заказ" },
+    hero: {
+      badge: "🍦 Жаңы жана табигый",
+      title: "Даамдуу балмуздак",
+      title2: "үйүңүзгө жеткирилет",
+      sub: "Чыныгы табигый ингредиенттердин даамын сезиңиз",
+      cta: "Азыр заказ бериңиз",
+      scroll: "Ылдый жылдырыңыз",
+    },
+    products: {
+      title: "Биздин даамдар",
+      sub: "Ар бир кашык — ырахат",
+      order: "Заказ",
+      items: [
+        { name: "Ваниль", desc: "Назик жана кремдүү классика", price: "150 сом", emoji: "🍦" },
+        { name: "Шоколад", desc: "Бай жана кара шоколад", price: "170 сом", emoji: "🍫" },
+        { name: "Кулпунай", desc: "Жаңы кулпунай жемиши", price: "160 сом", emoji: "🍓" },
+        { name: "Манго", desc: "Тропикалык таттуулук", price: "180 сом", emoji: "🥭" },
+        { name: "Фисташка", desc: "Сейрек жаңгак даамы", price: "200 сом", emoji: "🌿" },
+        { name: "Аралаш", desc: "Эң жакшы даамдардын айкалышы", price: "220 сом", emoji: "🎨" },
+      ],
+    },
+    why: {
+      title: "Эмне үчүн бизди тандайсыз?",
+      sub: "Сапат жана сүйүү менен даярдалат",
+      items: [
+        { icon: "🌿", title: "100% табигый", desc: "Таза жана табигый ингредиенттер гана" },
+        { icon: "⚡", title: "Тез жеткирүү", desc: "30 мүнөттүн ичинде эшикке" },
+        { icon: "⭐", title: "Жогорку сапат", desc: "Ар бир порция текшерилет" },
+        { icon: "❤️", title: "Кардар канааты", desc: "Кардарлардын 98% кайтып келет" },
+      ],
+    },
+    promo: {
+      badge: "🎁 Атайын сунуш",
+      title: "2 алсаңыз,",
+      title2: "1 текин беребиз!",
+      sub: "Чектелген убакыттагы сунуштан пайдаланыңыз",
+      urgency: "⏰ Сунуш бүгүн аяктайт!",
+      cta: "Азыр пайдаланыңыз",
+    },
+    reviews: {
+      title: "Кардарларыбыз эмне дейт",
+      sub: "Чыныгы пикирлер, чыныгы адамдар",
+      items: [
+        { name: "Азиза Т.", loc: "Ташкент", text: "Өмүрүмдөгү эң даамдуу балмуздак! Күн сайын заказ берем. Даамы жана сапаты укмуш!", rating: 5, avatar: "А" },
+        { name: "Бобур К.", loc: "Самарканд", text: "Тез жеткирүү жана айыккыс даамдар. Балдарым абдан кубанычта. Сунуш кылам!", rating: 5, avatar: "Б" },
+        { name: "Нилуфар Р.", loc: "Наманган", text: "Табигый ингредиенттерден даярдалышы абдан жакат. Ишенимдүү дүкөн!", rating: 5, avatar: "Н" },
+      ],
+    },
+    cta: {
+      title: "Азыр заказ бериңиз жана",
+      title2: "муздак бактыны сезиңиз!",
+      sub: "Биринчи заказга 20% арзандатуу",
+      btn: "Заказ берүү",
+    },
+    footer: "Бардык укуктар корголгон",
+    sticky: "Заказ",
+  },
+  EN: {
+    nav: { home: "Home", flavors: "Flavors", about: "About", reviews: "Reviews", order: "Order" },
+    hero: {
+      badge: "🍦 Fresh & Natural",
+      title: "Delicious Ice Cream",
+      title2: "Delivered to Your Door",
+      sub: "Feel the taste of real natural ingredients",
+      cta: "Order Now",
+      scroll: "Scroll down",
+    },
+    products: {
+      title: "Our Flavors",
+      sub: "Every spoonful is a delight",
+      order: "Order",
+      items: [
+        { name: "Vanilla", desc: "Delicate and creamy classic", price: "$4.99", emoji: "🍦" },
+        { name: "Chocolate", desc: "Rich and dark chocolate", price: "$5.49", emoji: "🍫" },
+        { name: "Strawberry", desc: "Fresh strawberry fruit", price: "$5.29", emoji: "🍓" },
+        { name: "Mango", desc: "Tropical and warm", price: "$5.99", emoji: "🥭" },
+        { name: "Pistachio", desc: "Rare nutty flavor", price: "$6.49", emoji: "🌿" },
+        { name: "Mix", desc: "Best flavors combined", price: "$6.99", emoji: "🎨" },
+      ],
+    },
+    why: {
+      title: "Why Choose Us?",
+      sub: "Made with quality and love",
+      items: [
+        { icon: "🌿", title: "100% Natural", desc: "Only clean natural ingredients" },
+        { icon: "⚡", title: "Fast Delivery", desc: "To your door in 30 minutes" },
+        { icon: "⭐", title: "High Quality", desc: "Every portion is checked" },
+        { icon: "❤️", title: "Customer Satisfaction", desc: "98% of customers return" },
+      ],
+    },
+    promo: {
+      badge: "🎁 Special Offer",
+      title: "Buy 2 Get",
+      title2: "1 Free!",
+      sub: "Take advantage of our limited time offer",
+      urgency: "⏰ Offer ends today!",
+      cta: "Grab the Deal",
+    },
+    reviews: {
+      title: "What Our Customers Say",
+      sub: "Real reviews, real people",
+      items: [
+        { name: "Aziza T.", loc: "Tashkent", text: "The most delicious ice cream of my life! I order every day. The taste and quality are amazing!", rating: 5, avatar: "A" },
+        { name: "Bobur K.", loc: "Samarkand", text: "Fast delivery and wonderful flavors. My kids are thrilled. Highly recommend!", rating: 5, avatar: "B" },
+        { name: "Nilufar R.", loc: "Namangan", text: "I love that it's made with natural ingredients. A trustworthy shop!", rating: 5, avatar: "N" },
+      ],
+    },
+    cta: {
+      title: "Order now and enjoy",
+      title2: "the cold taste of happiness!",
+      sub: "20% off your first order",
+      btn: "Order Now",
+    },
+    footer: "All rights reserved",
+    sticky: "Order",
+  },
+};
+
+const FLAVORS_BG = ["#FFF0F5","#3D1A00","#FFF0F5","#FFF8E1","#E8F5E9","#F3E5F5"];
+const FLAVORS_ACCENT = ["#FF6B6B","#FFCC80","#FF6B6B","#FFB300","#66BB6A","#AB47BC"];
+
+// ─── COMPONENTS ──────────────────────────────────────────────────────────────
+
+function Stars({ n = 5 }) {
+  return (
+    <span className="flex gap-0.5">
+      {Array.from({ length: n }).map((_, i) => (
+        <span key={i} style={{ color: "#FFB300", fontSize: 18 }}>★</span>
+      ))}
+    </span>
+  );
+}
+
+function useInView(threshold = 0.15) {
+  const ref = useRef(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setVisible(true); }, { threshold });
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, []);
+  return [ref, visible];
+}
+
+// ─── MAIN APP ─────────────────────────────────────────────────────────────────
+export default function IceCreamLanding() {
+  const [lang, setLang] = useState(() => localStorage.getItem("icecream_lang") || "UZ");
+  const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [activeColor, setActiveColor] = useState(0);
+  const t = T[lang];
+
+  useEffect(() => {
+    localStorage.setItem("icecream_lang", lang);
+  }, [lang]);
+
+  useEffect(() => {
+    const fn = () => setScrolled(window.scrollY > 60);
+    window.addEventListener("scroll", fn);
+    return () => window.removeEventListener("scroll", fn);
+  }, []);
+
+  const scrollTo = (id) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    setMenuOpen(false);
+  };
+
+  const [heroRef, heroVisible] = useInView(0.1);
+  const [prodRef, prodVisible] = useInView(0.1);
+  const [whyRef, whyVisible] = useInView(0.1);
+  const [promoRef, promoVisible] = useInView(0.1);
+  const [revRef, revVisible] = useInView(0.1);
+  const [ctaRef, ctaVisible] = useInView(0.1);
+
+  return (
+    <div style={{ fontFamily: "'Nunito', 'Segoe UI', sans-serif", background: "#FFF8F0", overflowX: "hidden" }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Pacifico&display=swap');
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #FFF3E0; }
+        ::-webkit-scrollbar-thumb { background: #FF6B6B; border-radius: 3px; }
+
+        .fade-up { opacity: 0; transform: translateY(40px); transition: all 0.7s cubic-bezier(.2,.8,.3,1); }
+        .fade-up.visible { opacity: 1; transform: translateY(0); }
+        .fade-up.d1 { transition-delay: 0.1s; }
+        .fade-up.d2 { transition-delay: 0.2s; }
+        .fade-up.d3 { transition-delay: 0.3s; }
+        .fade-up.d4 { transition-delay: 0.4s; }
+        .fade-up.d5 { transition-delay: 0.5s; }
+        .fade-up.d6 { transition-delay: 0.6s; }
+
+        @keyframes float {
+          0%, 100% { transform: translateY(0px) rotate(-3deg); }
+          50% { transform: translateY(-22px) rotate(3deg); }
+        }
+        @keyframes floatB {
+          0%, 100% { transform: translateY(0px) rotate(5deg) scale(1); }
+          50% { transform: translateY(-15px) rotate(-2deg) scale(1.04); }
+        }
+        @keyframes blob {
+          0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+          50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+        }
+        @keyframes spin-slow { to { transform: rotate(360deg); } }
+        @keyframes pulse { 0%,100%{transform:scale(1)}50%{transform:scale(1.06)} }
+        @keyframes drip {
+          0%   { height: 0; opacity: 0; }
+          30%  { opacity: 1; }
+          100% { height: 60px; opacity: 0; }
+        }
+        @keyframes shimmer {
+          0% { background-position: -200% center; }
+          100% { background-position: 200% center; }
+        }
+        .btn-primary {
+          background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+          color: white; border: none; border-radius: 50px;
+          padding: 16px 38px; font-size: 16px; font-weight: 800;
+          cursor: pointer; letter-spacing: 0.3px;
+          box-shadow: 0 8px 30px rgba(255,107,107,0.4);
+          transition: transform 0.2s, box-shadow 0.2s;
+          font-family: 'Nunito', sans-serif;
+        }
+        .btn-primary:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 14px 40px rgba(255,107,107,0.5); }
+        .btn-primary:active { transform: scale(0.97); }
+
+        .btn-outline {
+          background: transparent; color: #FF6B6B;
+          border: 2.5px solid #FF6B6B; border-radius: 50px;
+          padding: 12px 28px; font-size: 14px; font-weight: 800;
+          cursor: pointer; transition: all 0.2s;
+          font-family: 'Nunito', sans-serif;
+        }
+        .btn-outline:hover { background: #FF6B6B; color: white; transform: translateY(-2px); }
+
+        .card-hover { transition: transform 0.3s, box-shadow 0.3s; }
+        .card-hover:hover { transform: translateY(-10px); box-shadow: 0 24px 60px rgba(0,0,0,0.12) !important; }
+
+        .nav-link {
+          color: #6D4C41; font-weight: 700; font-size: 15px;
+          cursor: pointer; padding: 6px 2px;
+          position: relative; text-decoration: none;
+          transition: color 0.2s;
+          background: none; border: none; font-family: 'Nunito', sans-serif;
+        }
+        .nav-link::after {
+          content: ''; position: absolute; bottom: 0; left: 0;
+          width: 0; height: 2.5px; background: #FF6B6B; border-radius: 2px;
+          transition: width 0.25s;
+        }
+        .nav-link:hover { color: #FF6B6B; }
+        .nav-link:hover::after { width: 100%; }
+
+        .lang-btn {
+          padding: 5px 11px; border-radius: 20px; font-size: 12px; font-weight: 800;
+          cursor: pointer; border: 2px solid transparent; transition: all 0.2s;
+          font-family: 'Nunito', sans-serif;
+        }
+        .lang-btn.active { background: #FF6B6B; color: white; }
+        .lang-btn:not(.active) { background: white; color: #6D4C41; border-color: #E0C8B0; }
+        .lang-btn:not(.active):hover { border-color: #FF6B6B; color: #FF6B6B; }
+
+        .drip { position: absolute; bottom: -1px; width: 18px; background: #FF6B6B; border-radius: 0 0 12px 12px; animation: drip 2.5s ease-in-out infinite; }
+
+        .section-title { font-family: 'Pacifico', cursive; color: #6D4C41; }
+
+        @media (max-width: 768px) {
+          .hero-grid { flex-direction: column !important; }
+          .hero-text { text-align: center !important; align-items: center !important; }
+          .hero-img { order: -1; }
+          .nav-links { display: none !important; }
+          .nav-links.open { display: flex !important; flex-direction: column; position: absolute; top: 70px; left: 0; right: 0; background: white; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,.1); z-index: 99; }
+          .hide-mobile { display: none !important; }
+          .products-grid { grid-template-columns: repeat(2, 1fr) !important; }
+          .why-grid { grid-template-columns: repeat(2, 1fr) !important; }
+          .reviews-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
+
+      {/* ── NAVBAR ── */}
+      <nav style={{
+        position: "fixed", top: 0, left: 0, right: 0, zIndex: 1000,
+        background: scrolled ? "rgba(255,255,255,0.97)" : "transparent",
+        backdropFilter: scrolled ? "blur(12px)" : "none",
+        boxShadow: scrolled ? "0 2px 24px rgba(0,0,0,0.08)" : "none",
+        transition: "all 0.4s",
+        padding: "0 5%",
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        height: 68,
+      }}>
+        {/* Logo */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }} onClick={() => scrollTo("home")}>
+          <div style={{ width: 40, height: 40, background: "linear-gradient(135deg,#FF6B6B,#FFB347)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>🍦</div>
+          <span style={{ fontFamily: "'Pacifico', cursive", fontSize: 22, color: "#FF6B6B", letterSpacing: -0.5 }}>Scoops</span>
+        </div>
+
+        {/* Nav Links */}
+        <div className={`nav-links${menuOpen ? " open" : ""}`} style={{ display: "flex", gap: 28, alignItems: "center" }}>
+          {[["home","home"],["flavors","flavors"],["about","about"],["reviews","reviews"],["order","cta"]].map(([k,id]) => (
+            <button key={k} className="nav-link" onClick={() => scrollTo(id)}>{t.nav[k]}</button>
+          ))}
+        </div>
+
+        {/* Right side */}
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          {["UZ","RU","KG","EN"].map(l => (
+            <button key={l} className={`lang-btn${lang===l?" active":""}`} onClick={() => setLang(l)}>
+              {l}
+            </button>
+          ))}
+          {/* Hamburger */}
+          <button onClick={() => setMenuOpen(!menuOpen)} style={{ background: "none", border: "none", cursor: "pointer", marginLeft: 6, display: "none" }} className="hamburger" id="hamburger">
+            <div style={{ width: 24, height: 2, background: "#6D4C41", margin: "5px 0", borderRadius: 2, transition: "all 0.3s" }}/>
+            <div style={{ width: 24, height: 2, background: "#6D4C41", margin: "5px 0", borderRadius: 2 }}/>
+            <div style={{ width: 16, height: 2, background: "#6D4C41", margin: "5px 0", borderRadius: 2 }}/>
+          </button>
+        </div>
+      </nav>
+
+      {/* ── HERO ── */}
+      <section id="home" ref={heroRef} style={{
+        minHeight: "100vh", paddingTop: 80,
+        background: "linear-gradient(135deg, #FFF8F0 0%, #FFE4E1 50%, #FFF0E8 100%)",
+        display: "flex", alignItems: "center", position: "relative", overflow: "hidden",
+      }}>
+        {/* BG blobs */}
+        <div style={{ position:"absolute", width:500, height:500, background:"rgba(255,107,107,0.08)", borderRadius:"60% 40% 30% 70%/60% 30% 70% 40%", top:-100, right:-100, animation:"blob 7s ease-in-out infinite" }}/>
+        <div style={{ position:"absolute", width:350, height:350, background:"rgba(255,179,71,0.10)", borderRadius:"40% 60% 70% 30%/40% 50% 60% 50%", bottom:50, left:-80, animation:"blob 9s ease-in-out infinite reverse" }}/>
+
+        {/* Sprinkles */}
+        {["#FF6B6B","#FFB347","#6D4C41","#FF8FB1","#FFD700"].map((c,i)=>(
+          <div key={i} style={{ position:"absolute", width:8, height:22, background:c, borderRadius:4, opacity:0.6,
+            top:`${20+i*13}%`, left:`${5+i*18}%`, transform:`rotate(${30+i*40}deg)`,
+            animation:`float ${3+i*0.5}s ease-in-out infinite`, animationDelay:`${i*0.4}s` }}/>
+        ))}
+
+        <div className="hero-grid" style={{ display:"flex", alignItems:"center", justifyContent:"space-between", width:"100%", maxWidth:1200, margin:"0 auto", padding:"0 5%", gap:40 }}>
+          {/* Text */}
+          <div className="hero-text" style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"flex-start", gap:20, zIndex:2 }}>
+            <div className={`fade-up${heroVisible?" visible":""}`} style={{ background:"rgba(255,107,107,0.12)", color:"#FF6B6B", padding:"8px 20px", borderRadius:50, fontSize:14, fontWeight:800, display:"inline-block" }}>
+              {t.hero.badge}
+            </div>
+            <h1 className={`fade-up d1${heroVisible?" visible":""}`} style={{ fontFamily:"'Pacifico', cursive", fontSize:"clamp(36px,5vw,64px)", color:"#6D4C41", lineHeight:1.15 }}>
+              {t.hero.title}<br/>
+              <span style={{ color:"#FF6B6B" }}>{t.hero.title2}</span>
+            </h1>
+            <p className={`fade-up d2${heroVisible?" visible":""}`} style={{ fontSize:18, color:"#9E7B6F", maxWidth:440, lineHeight:1.7 }}>
+              {t.hero.sub}
+            </p>
+            <div className={`fade-up d3${heroVisible?" visible":""}`} style={{ display:"flex", gap:14, flexWrap:"wrap", marginTop:8 }}>
+              <button className="btn-primary" onClick={() => scrollTo("cta")}>
+                {t.hero.cta} →
+              </button>
+              <button className="btn-outline" onClick={() => scrollTo("flavors")}>
+                {t.nav.flavors} 🍨
+              </button>
+            </div>
+            {/* Stats */}
+            <div className={`fade-up d4${heroVisible?" visible":""}`} style={{ display:"flex", gap:32, marginTop:16, flexWrap:"wrap" }}>
+              {[["500+","Happy customers"],["20+","Unique flavors"],["30min","Delivery"]].map(([n,l])=>(
+                <div key={n}>
+                  <div style={{ fontSize:26, fontWeight:900, color:"#FF6B6B", fontFamily:"'Pacifico',cursive" }}>{n}</div>
+                  <div style={{ fontSize:13, color:"#9E7B6F", fontWeight:600 }}>{l}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Image / illustration */}
+          <div className="hero-img" style={{ flex:1, display:"flex", justifyContent:"center", alignItems:"center", position:"relative", zIndex:2 }}>
+            <div style={{ position:"relative", width:320, height:320 }}>
+              {/* Glow */}
+              <div style={{ position:"absolute", inset:-30, background:"radial-gradient(circle,rgba(255,107,107,0.2) 0%,transparent 70%)", borderRadius:"50%", animation:"pulse 2.5s ease-in-out infinite" }}/>
+              {/* Main ice cream */}
+              <div style={{ width:320, height:320, background:"linear-gradient(135deg,#FF6B6B,#FFB347)", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:160, animation:"floatB 4s ease-in-out infinite", boxShadow:"0 30px 80px rgba(255,107,107,0.35)" }}>
+                🍦
+              </div>
+              {/* Orbiters */}
+              {["🍓","🍫","🌿"].map((e,i)=>(
+                <div key={i} style={{ position:"absolute", fontSize:36, animation:`float ${2.5+i*0.7}s ease-in-out infinite`, animationDelay:`${i*0.6}s`,
+                  top: i===0?"10%":i===1?"70%":"30%", left: i===0?"75%":i===1?"75%":"-15%", filter:"drop-shadow(0 4px 8px rgba(0,0,0,0.15))" }}>
+                  {e}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Scroll indicator */}
+        <div style={{ position:"absolute", bottom:32, left:"50%", transform:"translateX(-50%)", display:"flex", flexDirection:"column", alignItems:"center", gap:6, opacity:0.6 }}>
+          <span style={{ fontSize:12, color:"#9E7B6F", fontWeight:600 }}>{t.hero.scroll}</span>
+          <div style={{ width:2, height:40, background:"#FF6B6B", borderRadius:2, animation:"drip 1.8s ease-in-out infinite", position:"relative" }}/>
+        </div>
+      </section>
+
+      {/* ── PRODUCTS ── */}
+      <section id="flavors" ref={prodRef} style={{ padding:"100px 5%", background:"#FFF8F0" }}>
+        <div style={{ maxWidth:1200, margin:"0 auto" }}>
+          <div style={{ textAlign:"center", marginBottom:60 }}>
+            <h2 className={`section-title fade-up${prodVisible?" visible":""}`} style={{ fontSize:"clamp(28px,4vw,48px)", marginBottom:12 }}>{t.products.title}</h2>
+            <p className={`fade-up d1${prodVisible?" visible":""}`} style={{ color:"#9E7B6F", fontSize:18 }}>{t.products.sub}</p>
+          </div>
+          <div className="products-grid" style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:28 }}>
+            {t.products.items.map((item, i) => (
+              <div key={i}
+                className={`card-hover fade-up d${i+1}${prodVisible?" visible":""}`}
+                onClick={() => setActiveColor(i)}
+                style={{ background:"white", borderRadius:28, padding:28, textAlign:"center", boxShadow:"0 8px 30px rgba(0,0,0,0.07)", cursor:"pointer", border: activeColor===i ? `2.5px solid ${FLAVORS_ACCENT[i]}` : "2.5px solid transparent", transition:"all 0.3s" }}>
+                <div style={{ width:100, height:100, background:FLAVORS_BG[i], borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:52, margin:"0 auto 16px", boxShadow:`0 8px 24px ${FLAVORS_ACCENT[i]}33`, animation:"float 4s ease-in-out infinite", animationDelay:`${i*0.3}s` }}>
+                  {item.emoji}
+                </div>
+                <h3 style={{ fontFamily:"'Pacifico',cursive", fontSize:22, color:"#6D4C41", marginBottom:8 }}>{item.name}</h3>
+                <p style={{ color:"#9E7B6F", fontSize:14, marginBottom:16, lineHeight:1.5 }}>{item.desc}</p>
+                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                  <span style={{ fontWeight:900, fontSize:20, color:FLAVORS_ACCENT[i] }}>{item.price}</span>
+                  <button className="btn-primary" style={{ padding:"10px 20px", fontSize:14 }}>{t.products.order}</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── WHY US ── */}
+      <section id="about" ref={whyRef} style={{ padding:"100px 5%", background:"linear-gradient(135deg,#6D4C41,#8B5E3C)", position:"relative", overflow:"hidden" }}>
+        <div style={{ position:"absolute", inset:0, backgroundImage:"radial-gradient(circle at 20% 50%, rgba(255,107,107,0.15) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255,179,71,0.1) 0%, transparent 40%)" }}/>
+        <div style={{ maxWidth:1200, margin:"0 auto", position:"relative", zIndex:2 }}>
+          <div style={{ textAlign:"center", marginBottom:60 }}>
+            <h2 className={`fade-up${whyVisible?" visible":""}`} style={{ fontFamily:"'Pacifico',cursive", fontSize:"clamp(28px,4vw,48px)", color:"white", marginBottom:12 }}>{t.why.title}</h2>
+            <p className={`fade-up d1${whyVisible?" visible":""}`} style={{ color:"rgba(255,255,255,0.7)", fontSize:18 }}>{t.why.sub}</p>
+          </div>
+          <div className="why-grid" style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:24 }}>
+            {t.why.items.map((item, i) => (
+              <div key={i} className={`card-hover fade-up d${i+1}${whyVisible?" visible":""}`} style={{ background:"rgba(255,255,255,0.08)", backdropFilter:"blur(12px)", borderRadius:24, padding:32, textAlign:"center", border:"1px solid rgba(255,255,255,0.15)" }}>
+                <div style={{ fontSize:48, marginBottom:16 }}>{item.icon}</div>
+                <h3 style={{ fontWeight:800, fontSize:18, color:"white", marginBottom:10 }}>{item.title}</h3>
+                <p style={{ color:"rgba(255,255,255,0.65)", fontSize:14, lineHeight:1.6 }}>{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── PROMO ── */}
+      <section ref={promoRef} style={{ padding:"80px 5%", background:"#FFF8F0" }}>
+        <div style={{ maxWidth:900, margin:"0 auto" }}>
+          <div className={`fade-up${promoVisible?" visible":""}`} style={{
+            background:"linear-gradient(135deg,#FF6B6B,#FF8E53)",
+            borderRadius:40, padding:"60px 50px", textAlign:"center",
+            boxShadow:"0 30px 80px rgba(255,107,107,0.35)",
+            position:"relative", overflow:"hidden"
+          }}>
+            {/* Confetti dots */}
+            {["#FFD700","#fff","#FFB347","#fff","#FFD700"].map((c,i)=>(
+              <div key={i} style={{ position:"absolute", width:14, height:14, background:c, borderRadius:"50%", opacity:0.4,
+                top:`${10+i*18}%`, left:`${8+i*20}%`, animation:`float ${2+i*0.4}s ease-in-out infinite`, animationDelay:`${i*0.3}s` }}/>
+            ))}
+            <div style={{ background:"rgba(255,255,255,0.2)", color:"white", padding:"6px 20px", borderRadius:50, display:"inline-block", fontSize:14, fontWeight:800, marginBottom:20 }}>
+              {t.promo.badge}
+            </div>
+            <h2 style={{ fontFamily:"'Pacifico',cursive", fontSize:"clamp(32px,5vw,58px)", color:"white", lineHeight:1.2, marginBottom:12, position:"relative", zIndex:2 }}>
+              {t.promo.title}<br/>{t.promo.title2}
+            </h2>
+            <p style={{ color:"rgba(255,255,255,0.85)", fontSize:18, marginBottom:8 }}>{t.promo.sub}</p>
+            <p style={{ color:"white", fontWeight:900, fontSize:16, marginBottom:32, animation:"pulse 1.5s ease-in-out infinite" }}>{t.promo.urgency}</p>
+            <button style={{ background:"white", color:"#FF6B6B", border:"none", borderRadius:50, padding:"16px 44px", fontSize:18, fontWeight:900, cursor:"pointer", boxShadow:"0 8px 30px rgba(0,0,0,0.15)", transition:"all 0.2s", fontFamily:"'Nunito',sans-serif" }}
+              onMouseOver={e=>{e.currentTarget.style.transform="translateY(-3px) scale(1.04)"; e.currentTarget.style.boxShadow="0 14px 40px rgba(0,0,0,0.2)"}}
+              onMouseOut={e=>{e.currentTarget.style.transform=""; e.currentTarget.style.boxShadow="0 8px 30px rgba(0,0,0,0.15)"}}>
+              {t.promo.cta} 🎉
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* ── REVIEWS ── */}
+      <section id="reviews" ref={revRef} style={{ padding:"100px 5%", background:"linear-gradient(180deg,#FFF8F0,#FFE4E1)" }}>
+        <div style={{ maxWidth:1200, margin:"0 auto" }}>
+          <div style={{ textAlign:"center", marginBottom:60 }}>
+            <h2 className={`section-title fade-up${revVisible?" visible":""}`} style={{ fontSize:"clamp(28px,4vw,48px)", marginBottom:12 }}>{t.reviews.title}</h2>
+            <p className={`fade-up d1${revVisible?" visible":""}`} style={{ color:"#9E7B6F", fontSize:18 }}>{t.reviews.sub}</p>
+          </div>
+          <div className="reviews-grid" style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:28 }}>
+            {t.reviews.items.map((r, i) => (
+              <div key={i} className={`card-hover fade-up d${i+1}${revVisible?" visible":""}`} style={{ background:"white", borderRadius:28, padding:32, boxShadow:"0 8px 30px rgba(0,0,0,0.07)" }}>
+                <Stars n={r.rating}/>
+                <p style={{ color:"#6D4C41", fontSize:15, lineHeight:1.7, margin:"16px 0 24px", fontStyle:"italic" }}>"{r.text}"</p>
+                <div style={{ display:"flex", alignItems:"center", gap:14 }}>
+                  <div style={{ width:46, height:46, borderRadius:"50%", background:"linear-gradient(135deg,#FF6B6B,#FFB347)", display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontWeight:900, fontSize:18 }}>{r.avatar}</div>
+                  <div>
+                    <div style={{ fontWeight:800, color:"#6D4C41" }}>{r.name}</div>
+                    <div style={{ fontSize:13, color:"#9E7B6F" }}>{r.loc}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── FINAL CTA ── */}
+      <section id="cta" ref={ctaRef} style={{ padding:"120px 5%", background:"#FFF8F0", textAlign:"center" }}>
+        <div style={{ maxWidth:700, margin:"0 auto" }}>
+          <div className={`fade-up${ctaVisible?" visible":""}`} style={{ fontSize:72, marginBottom:20, animation:"float 3s ease-in-out infinite" }}>🍨</div>
+          <h2 className={`section-title fade-up d1${ctaVisible?" visible":""}`} style={{ fontSize:"clamp(28px,4vw,52px)", marginBottom:12 }}>
+            {t.cta.title}<br/><span style={{ color:"#FF6B6B" }}>{t.cta.title2}</span>
+          </h2>
+          <p className={`fade-up d2${ctaVisible?" visible":""}`} style={{ color:"#9E7B6F", fontSize:18, marginBottom:40 }}>{t.cta.sub}</p>
+          <div className={`fade-up d3${ctaVisible?" visible":""}`}>
+            <button className="btn-primary" style={{ fontSize:20, padding:"20px 56px", animation:"pulse 2s ease-in-out infinite" }}>
+              {t.cta.btn} 🍦
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FOOTER ── */}
+      <footer style={{ background:"#6D4C41", color:"rgba(255,255,255,0.7)", padding:"32px 5%", textAlign:"center" }}>
+        <div style={{ display:"flex", justifyContent:"center", alignItems:"center", gap:8, marginBottom:12 }}>
+          <span style={{ fontSize:24 }}>🍦</span>
+          <span style={{ fontFamily:"'Pacifico',cursive", fontSize:22, color:"white" }}>Scoops</span>
+        </div>
+        <p style={{ fontSize:13 }}>© 2025 Scoops Ice Cream. {t.footer}.</p>
+      </footer>
+
+      {/* ── STICKY MOBILE CTA ── */}
+      <div style={{
+        position:"fixed", bottom:24, left:"50%", transform:"translateX(-50%)",
+        zIndex:999, display:"none"
+      }} className="sticky-cta">
+        <button className="btn-primary" style={{ padding:"14px 40px", fontSize:16, boxShadow:"0 10px 40px rgba(255,107,107,0.5)" }}
+          onClick={() => scrollTo("cta")}>
+          🍦 {t.sticky}
+        </button>
+      </div>
+
+      <style>{`
+        @media (max-width: 768px) {
+          .sticky-cta { display: block !important; }
+          #hamburger { display: block !important; }
+        }
+      `}</style>
+    </div>
+  );
+}
